@@ -19,11 +19,17 @@ input[type="text"], input:not([type]), input[type="date"], textarea {
 input:focus, textarea:focus { border-color: #667eea; }
 .error { color: #e53935; font-size: 13px; }
 .btn-row { display: flex; gap: 10px; }
-.btn { border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 15px; color: #fff; }
+.btn {
+  border: none; padding: 10px 18px; border-radius: 10px;
+  cursor: pointer; font-size: 15px; color: #fff;
+}
 .primary { background: linear-gradient(90deg, #667eea, #764ba2); flex: 1; }
 .grey { background: #9e9e9e; }
-.filters { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-.chip { border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; background: #ffffff55; color: #fff; font-weight: 600; }
+.filters { display: flex; gap: 10px; justify-content: center; margin-bottom: 12px; }
+.chip {
+  border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;
+  background: #ffffff55; color: #fff; font-weight: 600;
+}
 .chip.active { background: #fff; color: #764ba2; }
 .edit { background: #ffa726; padding: 8px 12px; }
 .del { background: #ef5350; padding: 8px 12px; }
@@ -40,12 +46,44 @@ input:focus, textarea:focus { border-color: #667eea; }
 .type-switch { display: flex; gap: 10px; }
 .chip2 {
   flex: 1; border: 2px solid #667eea; background: #fff; color: #667eea;
-  padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 15px;
+  padding: 10px; border-radius: 12px; cursor: pointer;
+  font-weight: 600; font-size: 15px;
 }
-.chip2.active { background: linear-gradient(90deg, #667eea, #764ba2); color: #fff; border-color: transparent; }
+.chip2.active {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  color: #fff; border-color: transparent;
+}
 .chip2:disabled { opacity: .6; cursor: not-allowed; }
 .lbl { font-size: 13px; color: #764ba2; font-weight: 600; }
 .today-note { color: #764ba2; font-weight: 600; }
+
+.cat-manager {
+  background: #fff8e1; border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.cat-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.cat-tag {
+  color: #fff; padding: 4px 10px; border-radius: 14px;
+  font-size: 13px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tag-x {
+  border: none; background: transparent; color: #fff;
+  cursor: pointer; font-size: 12px;
+}
+.cat-select {
+  padding: 10px; border: 2px solid #ddd; border-radius: 10px;
+  font-size: 15px; background: #fff;
+}
+.cat-select.wide { width: 100%; }
+.cat-filter {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-bottom: 15px;
+}
+.cat-badge {
+  font-size: 12px; color: #fff; padding: 2px 8px;
+  border-radius: 10px; margin-right: 8px;
+}
 
 .items-box {
   background: #f6f2ff; border-radius: 12px; padding: 12px;
@@ -59,14 +97,29 @@ input:focus, textarea:focus { border-color: #667eea; }
 .list-card { border-left: 6px solid #4caf50; }
 .list-card.overdue { border-left-color: #e53935; }
 .list-card.done { border-left-color: #9e9e9e; }
-.list-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.list-head {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 10px;
+}
 .list-head h3 { color: #333; margin-bottom: 6px; }
-.badge { font-size: 12px; background: #fff3e0; color: #ef6c00; padding: 2px 8px; border-radius: 10px; margin-right: 8px; }
+.badge {
+  font-size: 12px; background: #fff3e0; color: #ef6c00;
+  padding: 2px 8px; border-radius: 10px; margin-right: 8px;
+}
 .date { font-size: 13px; color: #764ba2; margin-right: 8px; }
-.count { font-size: 12px; background: #ede7f6; color: #5e35b1; padding: 2px 8px; border-radius: 10px; }
+.count {
+  font-size: 12px; background: #ede7f6; color: #5e35b1;
+  padding: 2px 8px; border-radius: 10px;
+}
 .day-title { margin-top: 12px; font-weight: 700; color: #5e35b1; font-size: 14px; }
-.items { list-style: none; margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
-.items li { display: flex; align-items: center; gap: 10px; background: #fafafa; padding: 8px 10px; border-radius: 8px; }
+.items {
+  list-style: none; margin-top: 6px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.items li {
+  display: flex; align-items: center; gap: 10px;
+  background: #fafafa; padding: 8px 10px; border-radius: 8px;
+}
 .items li input { width: auto; }
 .items li.item-done span { text-decoration: line-through; color: #999; }
 
