@@ -30,6 +30,13 @@ input:focus, textarea:focus { border-color: #667eea; }
 .actions { display: flex; gap: 6px; }
 .empty { text-align: center; color: #fff; font-size: 18px; }
 
+.nav { display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; }
+.nav-btn {
+  border: none; padding: 10px 22px; border-radius: 22px; cursor: pointer;
+  background: #ffffff55; color: #fff; font-weight: 700; font-size: 15px;
+}
+.nav-btn.active { background: #fff; color: #764ba2; }
+
 .type-switch { display: flex; gap: 10px; }
 .chip2 {
   flex: 1; border: 2px solid #667eea; background: #fff; color: #667eea;

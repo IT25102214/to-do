@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+import Goals from "./Goals";
 
 const API = "http://localhost:8080/api/todos";
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -38,6 +39,7 @@ export default function App() {
   const [errors, setErrors] = useState({});
   const [filter, setFilter] = useState("all");
   const [deleteId, setDeleteId] = useState(null);
+  const [page, setPage] = useState("lists");
 
   const load = async () => {
     const res = await axios.get(API);
@@ -150,6 +152,10 @@ export default function App() {
     load();
   };
 
+  const allTasks = lists.flatMap((l) => parse(l.description).groups.flat());
+  const doneTotal = allTasks.filter((t) => t.done).length;
+  const pendingTotal = allTasks.length - doneTotal;
+
   const shown = lists.filter((l) =>
     filter === "all" ? true : filter === "done" ? l.completed : !l.completed
   );
@@ -158,118 +164,131 @@ export default function App() {
     <div className="app">
       <h1>📝 My To-Do Lists</h1>
 
-      <form className="card form" onSubmit={submit}>
-        <h2>{editId ? "✏️ Edit List" : "➕ New List"}</h2>
+      <div className="nav">
+        <button className={`nav-btn ${page === "lists" ? "active" : ""}`} onClick={() => setPage("lists")}>📋 Lists</button>
+        <button className={`nav-btn ${page === "goals" ? "active" : ""}`} onClick={() => setPage("goals")}>🎯 Goals</button>
+      </div>
 
-        <div className="type-switch">
-          <button type="button" disabled={!!editId}
-            className={`chip2 ${form.type === "today" ? "active" : ""}`}
-            onClick={() => switchType("today")}>📅 Today To-Do</button>
-          <button type="button" disabled={!!editId}
-            className={`chip2 ${form.type === "week" ? "active" : ""}`}
-            onClick={() => switchType("week")}>🗓️ Week Plan</button>
-        </div>
+      {page === "goals" && (
+        <Goals done={doneTotal} pending={pendingTotal} lists={lists.length} />
+      )}
 
-        <input
-          placeholder={`List name (default: ${defaultTitle})`}
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-        />
-        {errors.title && <span className="error">{errors.title}</span>}
+      {page === "lists" && (
+        <>
+          <form className="card form" onSubmit={submit}>
+            <h2>{editId ? "✏️ Edit List" : "➕ New List"}</h2>
 
-        {form.type === "week" ? (
-          <>
-            <label className="lbl">Week start date</label>
-            <input type="date" min={today} value={form.start}
-              onChange={(e) => setForm({ ...form, start: e.target.value })} />
-            {errors.start && <span className="error">{errors.start}</span>}
-          </>
-        ) : (
-          <p className="today-note">📅 Date: {today} (today)</p>
-        )}
+            <div className="type-switch">
+              <button type="button" disabled={!!editId}
+                className={`chip2 ${form.type === "today" ? "active" : ""}`}
+                onClick={() => switchType("today")}>📅 Today To-Do</button>
+              <button type="button" disabled={!!editId}
+                className={`chip2 ${form.type === "week" ? "active" : ""}`}
+                onClick={() => switchType("week")}>🗓️ Week Plan</button>
+            </div>
 
-        {form.groups.map((group, g) => (
-          <div className="items-box" key={g}>
-            <strong>
-              {form.type === "week" ? `${form.start ? dayLabel(form.start, g) : `Day ${g + 1}`}` : "Tasks"}
-            </strong>
-            {group.map((it, idx) => (
-              <div className="item-row" key={idx}>
-                <input placeholder={`Task ${idx + 1}`} value={it}
-                  onChange={(e) => setItem(g, idx, e.target.value)} />
-                <button type="button" className="btn del small" onClick={() => removeItem(g, idx)}>✕</button>
+            <input
+              placeholder={`List name (default: ${defaultTitle})`}
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+            {errors.title && <span className="error">{errors.title}</span>}
+
+            {form.type === "week" ? (
+              <>
+                <label className="lbl">Week start date</label>
+                <input type="date" min={today} value={form.start}
+                  onChange={(e) => setForm({ ...form, start: e.target.value })} />
+                {errors.start && <span className="error">{errors.start}</span>}
+              </>
+            ) : (
+              <p className="today-note">📅 Date: {today} (today)</p>
+            )}
+
+            {form.groups.map((group, g) => (
+              <div className="items-box" key={g}>
+                <strong>
+                  {form.type === "week" ? `${form.start ? dayLabel(form.start, g) : `Day ${g + 1}`}` : "Tasks"}
+                </strong>
+                {group.map((it, idx) => (
+                  <div className="item-row" key={idx}>
+                    <input placeholder={`Task ${idx + 1}`} value={it}
+                      onChange={(e) => setItem(g, idx, e.target.value)} />
+                    <button type="button" className="btn del small" onClick={() => removeItem(g, idx)}>✕</button>
+                  </div>
+                ))}
+                <button type="button" className="btn add-item" onClick={() => addItem(g)}>+ Add item</button>
               </div>
             ))}
-            <button type="button" className="btn add-item" onClick={() => addItem(g)}>+ Add item</button>
-          </div>
-        ))}
-        {errors.items && <span className="error">{errors.items}</span>}
+            {errors.items && <span className="error">{errors.items}</span>}
 
-        <div className="btn-row">
-          <button type="submit" className="btn primary">
-            {editId ? "Update List" : "Save List"}
-          </button>
-          {editId && (
-            <button type="button" className="btn grey"
-              onClick={() => { setEditId(null); setForm(newForm()); setErrors({}); }}>
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      <div className="filters">
-        {["all", "pending", "done"].map((f) => (
-          <button key={f} className={`chip ${filter === f ? "active" : ""}`} onClick={() => setFilter(f)}>
-            {f.toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <div className="list">
-        {shown.length === 0 && <p className="empty">No lists yet 🎉</p>}
-        {shown.map((l) => {
-          const p = parse(l.description);
-          const all = p.groups.flat();
-          const doneCount = all.filter((i) => i.done).length;
-          const start = p.start || l.dueDate;
-          return (
-            <div key={l.id}
-              className={`card list-card ${l.completed ? "done" : ""} ${!l.completed && l.dueDate < today ? "overdue" : ""}`}>
-              <div className="list-head">
-                <div>
-                  <h3>{l.title}</h3>
-                  <span className="badge">{p.type === "week" ? "🗓️ Week" : "📅 Today"}</span>
-                  <span className="date">
-                    {p.type === "week" ? `${start} → ${l.dueDate}` : start}
-                  </span>
-                  <span className="count">{doneCount}/{all.length} done</span>
-                </div>
-                <div className="actions">
-                  <button className="btn edit" onClick={() => edit(l)}>✏️</button>
-                  <button className="btn del" onClick={() => setDeleteId(l.id)}>🗑️</button>
-                </div>
-              </div>
-
-              {p.groups.map((group, g) =>
-                group.length === 0 ? null : (
-                  <div key={g}>
-                    {p.type === "week" && <div className="day-title">{dayLabel(start, g)}</div>}
-                    <ul className="items">
-                      {group.map((it, idx) => (
-                        <li key={idx} className={it.done ? "item-done" : ""}>
-                          <input type="checkbox" checked={it.done} onChange={() => toggleItem(l, g, idx)} />
-                          <span>{it.text}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )
+            <div className="btn-row">
+              <button type="submit" className="btn primary">
+                {editId ? "Update List" : "Save List"}
+              </button>
+              {editId && (
+                <button type="button" className="btn grey"
+                  onClick={() => { setEditId(null); setForm(newForm()); setErrors({}); }}>
+                  Cancel
+                </button>
               )}
             </div>
-          );
-        })}
-      </div>
+          </form>
+
+          <div className="filters">
+            {["all", "pending", "done"].map((f) => (
+              <button key={f} className={`chip ${filter === f ? "active" : ""}`} onClick={() => setFilter(f)}>
+                {f.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          <div className="list">
+            {shown.length === 0 && <p className="empty">No lists yet 🎉</p>}
+            {shown.map((l) => {
+              const p = parse(l.description);
+              const all = p.groups.flat();
+              const doneCount = all.filter((i) => i.done).length;
+              const start = p.start || l.dueDate;
+              return (
+                <div key={l.id}
+                  className={`card list-card ${l.completed ? "done" : ""} ${!l.completed && l.dueDate < today ? "overdue" : ""}`}>
+                  <div className="list-head">
+                    <div>
+                      <h3>{l.title}</h3>
+                      <span className="badge">{p.type === "week" ? "🗓️ Week" : "📅 Today"}</span>
+                      <span className="date">
+                        {p.type === "week" ? `${start} → ${l.dueDate}` : start}
+                      </span>
+                      <span className="count">{doneCount}/{all.length} done</span>
+                    </div>
+                    <div className="actions">
+                      <button className="btn edit" onClick={() => edit(l)}>✏️</button>
+                      <button className="btn del" onClick={() => setDeleteId(l.id)}>🗑️</button>
+                    </div>
+                  </div>
+
+                  {p.groups.map((group, g) =>
+                    group.length === 0 ? null : (
+                      <div key={g}>
+                        {p.type === "week" && <div className="day-title">{dayLabel(start, g)}</div>}
+                        <ul className="items">
+                          {group.map((it, idx) => (
+                            <li key={idx} className={it.done ? "item-done" : ""}>
+                              <input type="checkbox" checked={it.done} onChange={() => toggleItem(l, g, idx)} />
+                              <span>{it.text}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {deleteId && (
         <div className="overlay" onClick={() => setDeleteId(null)}>
